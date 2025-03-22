@@ -1,0 +1,11 @@
+#canvasContainer {
+  position: relative;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

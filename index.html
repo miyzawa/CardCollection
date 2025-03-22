@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>画像フレーム合成</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <h2>画像フレーム合成ツール</h2>
+
+    <label>フレーム画像を選択:</label>
+    <select id="frameSelector">
+      <option value="frame1.png">フレーム1</option>
+      <option value="frame2.png">フレーム2</option></select
+    ><br /><br />
+
+    <label>画像をアップロード:</label>
+    <input type="file" id="uploadImage" accept="image/*" /><br /><br />
+
+    <label>中央に挿入するテキスト:</label>
+    <textarea
+      id="centerText"
+      rows="4"
+      cols="40"
+      placeholder="ここに入力してください"
+    ></textarea
+    ><br /><br />
+
+    <div id="canvasContainer">
+      <canvas id="baseCanvas"></canvas>
+      <canvas id="frameCanvas"></canvas>
+      <canvas id="textCanvas"></canvas>
+    </div>
+
+    <button id="downloadBtn">ダウンロード</button>
+
+    <script src="index.js"></script>
+  </body>
+</html>
