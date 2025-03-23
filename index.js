@@ -1,10 +1,9 @@
 const baseCanvas = document.getElementById("baseCanvas");
 const frameCanvas = document.getElementById("frameCanvas");
-const textCanvas = document.getElementById("textCanvas");
+const upperLeftTextCanvas = document.getElementById("upperLeftTextCanvas");
 const baseCtx = baseCanvas.getContext("2d");
 const frameCtx = frameCanvas.getContext("2d");
-const textCtx = textCanvas.getContext("2d");
-
+const upperLeftTextCtx = upperLeftTextCanvas.getContext("2d");
 const container = document.getElementById("canvasContainer");
 
 let uploadImg = null;
@@ -13,29 +12,29 @@ let offsetX = 0,
 let dragging = false;
 let dragStartX = 0,
   dragStartY = 0;
-let centerText = "";
+let inputText = "";
 
-const drawText = () => {
-  textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
-  if (!centerText) return;
+const drawTextCtx = (ctx, canvas, text, posX, posY) => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!text) return;
 
-  textCtx.font = "bold 36px sans-serif";
-  textCtx.fillStyle = "white";
-  textCtx.textAlign = "center";
-  textCtx.textBaseline = "middle";
-  textCtx.strokeStyle = "black";
-  textCtx.lineWidth = 2;
+  ctx.font = "bold 48px Georgia";
+  ctx.fillStyle = "black";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
 
-  const lines = centerText.split("\n");
+  const lines = text.split("\n");
   const lineHeight = 42;
 
-  const centerX = textCanvas.width / 2;
-  const centerY = textCanvas.height * (1 / 6);
+  const centerX = canvas.width * posX;
+  const centerY = canvas.height * posY;
 
   lines.forEach((line, i) => {
     const y = centerY + i * lineHeight;
-    textCtx.strokeText(line, centerX, y);
-    textCtx.fillText(line, centerX, y);
+    ctx.strokeText(line, centerX, y);
+    ctx.fillText(line, centerX, y);
   });
 };
 
@@ -48,7 +47,6 @@ const draw = () => {
 
     baseCtx.drawImage(uploadImg, offsetX, offsetY, drawWidth, drawHeight);
   }
-  drawText();
 };
 
 document.getElementById("frameSelector").addEventListener("change", (e) => {
@@ -58,8 +56,6 @@ document.getElementById("frameSelector").addEventListener("change", (e) => {
     baseCanvas.height = frame.height;
     frameCanvas.width = frame.width;
     frameCanvas.height = frame.height;
-    textCanvas.width = frame.width;
-    textCanvas.height = frame.height;
     container.style.width = frame.width + "px";
     container.style.height = frame.height + "px";
 
@@ -88,8 +84,8 @@ document.getElementById("uploadImage").addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-document.getElementById("centerText").addEventListener("input", (e) => {
-  centerText = e.target.value;
+document.getElementById("inputText").addEventListener("input", (e) => {
+  inputText = e.target.value;
   draw();
 });
 
@@ -117,7 +113,6 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   const ctx = combinedCanvas.getContext("2d");
   ctx.drawImage(baseCanvas, 0, 0);
   ctx.drawImage(frameCanvas, 0, 0);
-  ctx.drawImage(textCanvas, 0, 0);
   const link = document.createElement("a");
   link.download = "framed_image.png";
   link.href = combinedCanvas.toDataURL();
