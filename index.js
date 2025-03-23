@@ -250,8 +250,15 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   combinedCanvas.width = baseCanvas.width;
   combinedCanvas.height = baseCanvas.height;
   const ctx = combinedCanvas.getContext("2d");
+
   ctx.drawImage(baseCanvas, 0, 0);
   ctx.drawImage(frameCanvas, 0, 0);
+  ctx.drawImage(upperLeftTextCanvas, 0, 0);
+  ctx.drawImage(upperCenterTextCanvas, 0, 0);
+  ctx.drawImage(upperCenterTextYomiCanvas, 0, 0);
+  ctx.drawImage(upperRightTextCanvas, 0, 0);
+  ctx.drawImage(cardEffectTextCanvas, 0, 0);
+  ctx.drawImage(uploadImageMoveAreaCanvas, 0, 0);
   const link = document.createElement("a");
   link.download = "framed_image.png";
   link.href = combinedCanvas.toDataURL();
