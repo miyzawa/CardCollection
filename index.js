@@ -30,6 +30,20 @@ let dragStartX = 0,
   dragStartY = 0;
 let inputText = "";
 
+//ここに挿入
+window.addEventListener("DOMContentLoaded", () => {
+  const inputText = document.getElementById("inputText");
+  inputText.value = `17
+ーーーーーーーーーー
+さんぷるかーどめい 
+ーーーーーーーーーー
+サンプルカード名 
+ーーーーーーーーーー
+S-1
+ーーーーーーーーーー
+カードの効果を記載`;
+});
+
 const drawTextCtx = (ctx, canvas, text, options = {}) => {
   let {
     fontSize = 48,
