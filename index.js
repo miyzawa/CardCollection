@@ -35,10 +35,10 @@ const drawTextCtx = (ctx, text, posX, posY, width, height) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.strokeStyle = "black";
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 4;
 
   const lines = text.split("\n");
-  const lineHeight = 42;
+  const lineHeight = 40;
 
   lines.forEach((line, i) => {
     const y = posY + i * lineHeight;
@@ -56,6 +56,17 @@ const draw = () => {
 
     baseCtx.drawImage(uploadImg, offsetX, offsetY, drawWidth, drawHeight);
   }
+
+  console.log("hello");
+  console.log();
+  drawTextCtx(
+    upperLeftTextCtx,
+    "17",
+    Number(upperLeftTextCanvas.style.left.replace("px", "")),
+    upperLeftTextCanvas.height / 2,
+    upperLeftTextCanvas.width,
+    upperLeftTextCanvas.height
+  );
 };
 
 document.getElementById("frameSelector").addEventListener("change", (e) => {
@@ -82,8 +93,11 @@ document.getElementById("frameSelector").addEventListener("change", (e) => {
     upperRightTextCanvas.style.left = img.width * 0.71 + "px";
     upperRightTextCanvas.style.top = img.height * 0.05 + "px";
 
-    cardEffectTextCanvas.width = img.width;
-    cardEffectTextCanvas.height = img.height;
+    cardEffectTextCanvas.width = img.width * 0.87;
+    cardEffectTextCanvas.height = img.height * 0.333;
+    cardEffectTextCanvas.style.left = img.width * 0.068 + "px";
+    cardEffectTextCanvas.style.top = img.height * 0.605 + "px";
+
     uploadImageMoveAreaCanvas.width = img.width;
     uploadImageMoveAreaCanvas.height = img.height;
     frameCanvas.width = img.width;
