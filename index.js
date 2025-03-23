@@ -26,24 +26,91 @@ let dragStartX = 0,
   dragStartY = 0;
 let inputText = "";
 
-const drawTextCtx = (ctx, text, posX, posY, width, height) => {
+const drawTextCtx = (ctx, canvas, text, options = {}) => {
+  let {
+    fontSize = 48,
+    fontFamily = "Georgia",
+    bold = false,
+    position = "center", // "center" | "top-left" など
+    margin = {}, // 例: { top: 0.1, left: 0.2 }
+  } = options;
+
+  const width = canvas.width;
+  const height = canvas.height;
+
+  const marginTop = (margin.top || 0) * height;
+  const marginBottom = (margin.bottom || 0) * height;
+  const marginLeft = (margin.left || 0) * width;
+  const marginRight = (margin.right || 0) * width;
+
   ctx.clearRect(0, 0, width, height);
   if (!text) return;
 
-  ctx.font = "bold 48px Georgia";
+  const lines = text.split("\n");
+  const maxWidth = width - marginLeft - marginRight;
+  const maxHeight = height - marginTop - marginBottom;
+
+  const fontWeight = bold ? "bold" : "normal";
+  const lineHeightRatio = 1.2;
+
+  const measureFontSize = () => {
+    let testFontSize = fontSize;
+
+    while (testFontSize > 5) {
+      ctx.font = `${fontWeight} ${testFontSize}px ${fontFamily}`;
+      const lineHeights = testFontSize * lineHeightRatio;
+      const totalTextHeight = lineHeights * lines.length;
+
+      const widestLine = lines.reduce((max, line) => {
+        const width = ctx.measureText(line).width;
+        return Math.max(max, width);
+      }, 0);
+
+      if (widestLine <= maxWidth && totalTextHeight <= maxHeight) {
+        return testFontSize;
+      }
+
+      testFontSize -= 1;
+    }
+
+    return testFontSize;
+  };
+
+  fontSize = measureFontSize();
+  ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
   ctx.fillStyle = "black";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
   ctx.strokeStyle = "black";
   ctx.lineWidth = 4;
 
-  const lines = text.split("\n");
-  const lineHeight = 40;
+  const lineHeight = fontSize * lineHeightRatio;
+  const totalHeight = lineHeight * lines.length;
+
+  let startX, startY;
+
+  switch (position) {
+    case "top-left":
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      startX = marginLeft;
+      startY = marginTop;
+      break;
+
+    case "center":
+    default:
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      const availableWidth = width - marginLeft - marginRight;
+      const availableHeight = height - marginTop - marginBottom;
+
+      startX = marginLeft + availableWidth / 2;
+      startY = marginTop + (availableHeight - totalHeight) / 2;
+      break;
+  }
 
   lines.forEach((line, i) => {
-    const y = posY + i * lineHeight;
-    ctx.strokeText(line, posX, y);
-    ctx.fillText(line, posX, y);
+    const y = startY + i * lineHeight;
+    ctx.strokeText(line, startX, y);
+    ctx.fillText(line, startX, y);
   });
 };
 
@@ -57,16 +124,23 @@ const draw = () => {
     baseCtx.drawImage(uploadImg, offsetX, offsetY, drawWidth, drawHeight);
   }
 
-  console.log("hello");
-  console.log();
-  drawTextCtx(
-    upperLeftTextCtx,
-    "17",
-    Number(upperLeftTextCanvas.style.left.replace("px", "")),
-    upperLeftTextCanvas.height / 2,
-    upperLeftTextCanvas.width,
-    upperLeftTextCanvas.height
-  );
+  const inputTextList = inputText.split("\nーーーーーーーーーー\n");
+
+  drawTextCtx(upperLeftTextCtx, upperLeftTextCanvas, inputTextList[0], {
+    margin: { top: 0.1 },
+  });
+  drawTextCtx(upperCenterTexCtx, upperCenterTextCanvas, inputTextList[1], {
+    fontFamily: "serif",
+    margin: { top: 0.1 },
+  });
+  drawTextCtx(upperRightTextCtx, upperRightTextCanvas, inputTextList[2], {
+    margin: { top: 0.1 },
+  });
+  drawTextCtx(cardEffectTextCtx, cardEffectTextCanvas, inputTextList[3], {
+    fontFamily: "serif",
+    position: "top-left",
+    margin: { top: 0.06, left: 0.03, right: 0.03, bottom: 0.06 },
+  });
 };
 
 document.getElementById("frameSelector").addEventListener("change", (e) => {
@@ -100,8 +174,6 @@ document.getElementById("frameSelector").addEventListener("change", (e) => {
 
     uploadImageMoveAreaCanvas.width = img.width;
     uploadImageMoveAreaCanvas.height = img.height;
-    frameCanvas.width = img.width;
-    frameCanvas.height = img.height;
 
     container.style.width = img.width + "px";
     container.style.height = img.height + "px";
