@@ -1,9 +1,21 @@
 const baseCanvas = document.getElementById("baseCanvas");
 const frameCanvas = document.getElementById("frameCanvas");
 const upperLeftTextCanvas = document.getElementById("upperLeftTextCanvas");
+const upperCenterTextCanvas = document.getElementById("upperCenterTextCanvas");
+const upperRightTextCanvas = document.getElementById("upperRightTextCanvas");
+const cardEffectTextCanvas = document.getElementById("cardEffectTextCanvas");
+const uploadImageMoveAreaCanvas = document.getElementById(
+  "uploadImageMoveAreaCanvas"
+);
+
 const baseCtx = baseCanvas.getContext("2d");
 const frameCtx = frameCanvas.getContext("2d");
 const upperLeftTextCtx = upperLeftTextCanvas.getContext("2d");
+const upperCenterTexCtx = upperCenterTextCanvas.getContext("2d");
+const upperRightTextCtx = upperRightTextCanvas.getContext("2d");
+const cardEffectTextCtx = cardEffectTextCanvas.getContext("2d");
+const uploadImageMoveAreaCtx = uploadImageMoveAreaCanvas.getContext("2d");
+
 const container = document.getElementById("canvasContainer");
 
 let uploadImg = null;
@@ -14,8 +26,8 @@ let dragStartX = 0,
   dragStartY = 0;
 let inputText = "";
 
-const drawTextCtx = (ctx, canvas, text, posX, posY) => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+const drawTextCtx = (ctx, text, posX, posY, width, height) => {
+  ctx.clearRect(0, 0, width, height);
   if (!text) return;
 
   ctx.font = "bold 48px Georgia";
@@ -28,13 +40,10 @@ const drawTextCtx = (ctx, canvas, text, posX, posY) => {
   const lines = text.split("\n");
   const lineHeight = 42;
 
-  const centerX = canvas.width * posX;
-  const centerY = canvas.height * posY;
-
   lines.forEach((line, i) => {
-    const y = centerY + i * lineHeight;
-    ctx.strokeText(line, centerX, y);
-    ctx.fillText(line, centerX, y);
+    const y = posY + i * lineHeight;
+    ctx.strokeText(line, posX, y);
+    ctx.fillText(line, posX, y);
   });
 };
 
@@ -50,21 +59,45 @@ const draw = () => {
 };
 
 document.getElementById("frameSelector").addEventListener("change", (e) => {
-  const frame = new Image();
-  frame.onload = () => {
-    baseCanvas.width = frame.width;
-    baseCanvas.height = frame.height;
-    frameCanvas.width = frame.width;
-    frameCanvas.height = frame.height;
-    container.style.width = frame.width + "px";
-    container.style.height = frame.height + "px";
+  const img = new Image();
+  img.onload = () => {
+    // 各キャンバスのエリア
+    baseCanvas.width = img.width;
+    baseCanvas.height = img.height;
+    frameCanvas.width = img.width;
+    frameCanvas.height = img.height;
+
+    upperLeftTextCanvas.width = img.width * 0.28;
+    upperLeftTextCanvas.height = img.height * 0.09;
+    upperLeftTextCanvas.style.left = img.width * 0.03 + "px";
+    upperLeftTextCanvas.style.top = img.height * 0.05 + "px";
+
+    upperCenterTextCanvas.width = img.width * 0.4;
+    upperCenterTextCanvas.height = img.height * 0.09;
+    upperCenterTextCanvas.style.left = img.width * 0.31 + "px";
+    upperCenterTextCanvas.style.top = img.height * 0.05 + "px";
+
+    upperRightTextCanvas.width = img.width * 0.27;
+    upperRightTextCanvas.height = img.height * 0.09;
+    upperRightTextCanvas.style.left = img.width * 0.71 + "px";
+    upperRightTextCanvas.style.top = img.height * 0.05 + "px";
+
+    cardEffectTextCanvas.width = img.width;
+    cardEffectTextCanvas.height = img.height;
+    uploadImageMoveAreaCanvas.width = img.width;
+    uploadImageMoveAreaCanvas.height = img.height;
+    frameCanvas.width = img.width;
+    frameCanvas.height = img.height;
+
+    container.style.width = img.width + "px";
+    container.style.height = img.height + "px";
 
     frameCtx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
-    frameCtx.drawImage(frame, 0, 0, frameCanvas.width, frameCanvas.height);
+    frameCtx.drawImage(img, 0, 0, frameCanvas.width, frameCanvas.height);
 
     draw();
   };
-  frame.src = e.target.value;
+  img.src = e.target.value;
 });
 
 document.getElementById("uploadImage").addEventListener("change", (e) => {
@@ -89,13 +122,13 @@ document.getElementById("inputText").addEventListener("input", (e) => {
   draw();
 });
 
-frameCanvas.addEventListener("mousedown", (e) => {
+uploadImageMoveAreaCanvas.addEventListener("mousedown", (e) => {
   dragStartX = e.offsetX - offsetX;
   dragStartY = e.offsetY - offsetY;
   dragging = true;
 });
 
-frameCanvas.addEventListener("mousemove", (e) => {
+uploadImageMoveAreaCanvas.addEventListener("mousemove", (e) => {
   if (dragging) {
     offsetX = e.offsetX - dragStartX;
     offsetY = e.offsetY - dragStartY;
@@ -103,8 +136,11 @@ frameCanvas.addEventListener("mousemove", (e) => {
   }
 });
 
-frameCanvas.addEventListener("mouseup", () => (dragging = false));
-frameCanvas.addEventListener("mouseleave", () => (dragging = false));
+uploadImageMoveAreaCanvas.addEventListener("mouseup", () => (dragging = false));
+uploadImageMoveAreaCanvas.addEventListener(
+  "mouseleave",
+  () => (dragging = false)
+);
 
 document.getElementById("downloadBtn").addEventListener("click", () => {
   const combinedCanvas = document.createElement("canvas");
