@@ -253,12 +253,21 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
 
   ctx.drawImage(baseCanvas, 0, 0);
   ctx.drawImage(frameCanvas, 0, 0);
-  ctx.drawImage(upperLeftTextCanvas, 0, 0);
-  ctx.drawImage(upperCenterTextCanvas, 0, 0);
-  ctx.drawImage(upperCenterTextYomiCanvas, 0, 0);
-  ctx.drawImage(upperRightTextCanvas, 0, 0);
-  ctx.drawImage(cardEffectTextCanvas, 0, 0);
-  ctx.drawImage(uploadImageMoveAreaCanvas, 0, 0);
+
+  const drawAtOffset = (canvas) => {
+    console.log(canvas.style.left);
+    const x = parseFloat(canvas.style.left || "0");
+    const y = parseFloat(canvas.style.top || "0");
+    ctx.drawImage(canvas, x, y);
+  };
+
+  drawAtOffset(upperLeftTextCanvas);
+  drawAtOffset(upperCenterTextYomiCanvas);
+  drawAtOffset(upperCenterTextCanvas);
+  drawAtOffset(upperRightTextCanvas);
+  drawAtOffset(cardEffectTextCanvas);
+  drawAtOffset(uploadImageMoveAreaCanvas);
+
   const link = document.createElement("a");
   link.download = "framed_image.png";
   link.href = combinedCanvas.toDataURL();
