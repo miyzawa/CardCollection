@@ -2,6 +2,9 @@ const baseCanvas = document.getElementById("baseCanvas");
 const frameCanvas = document.getElementById("frameCanvas");
 const upperLeftTextCanvas = document.getElementById("upperLeftTextCanvas");
 const upperCenterTextCanvas = document.getElementById("upperCenterTextCanvas");
+const upperCenterTextYomiCanvas = document.getElementById(
+  "upperCenterTextYomiCanvas"
+);
 const upperRightTextCanvas = document.getElementById("upperRightTextCanvas");
 const cardEffectTextCanvas = document.getElementById("cardEffectTextCanvas");
 const uploadImageMoveAreaCanvas = document.getElementById(
@@ -11,7 +14,8 @@ const uploadImageMoveAreaCanvas = document.getElementById(
 const baseCtx = baseCanvas.getContext("2d");
 const frameCtx = frameCanvas.getContext("2d");
 const upperLeftTextCtx = upperLeftTextCanvas.getContext("2d");
-const upperCenterTexCtx = upperCenterTextCanvas.getContext("2d");
+const upperCenterTextCtx = upperCenterTextCanvas.getContext("2d");
+const upperCenterTextYomiCtx = upperCenterTextYomiCanvas.getContext("2d");
 const upperRightTextCtx = upperRightTextCanvas.getContext("2d");
 const cardEffectTextCtx = cardEffectTextCanvas.getContext("2d");
 const uploadImageMoveAreaCtx = uploadImageMoveAreaCanvas.getContext("2d");
@@ -129,14 +133,22 @@ const draw = () => {
   drawTextCtx(upperLeftTextCtx, upperLeftTextCanvas, inputTextList[0], {
     margin: { top: 0.1 },
   });
-  drawTextCtx(upperCenterTexCtx, upperCenterTextCanvas, inputTextList[1], {
+  drawTextCtx(
+    upperCenterTextYomiCtx,
+    upperCenterTextYomiCanvas,
+    inputTextList[1],
+    {
+      fontFamily: "serif",
+      fontSize: 25,
+    }
+  );
+  drawTextCtx(upperCenterTextCtx, upperCenterTextCanvas, inputTextList[2], {
     fontFamily: "serif",
+  });
+  drawTextCtx(upperRightTextCtx, upperRightTextCanvas, inputTextList[3], {
     margin: { top: 0.1 },
   });
-  drawTextCtx(upperRightTextCtx, upperRightTextCanvas, inputTextList[2], {
-    margin: { top: 0.1 },
-  });
-  drawTextCtx(cardEffectTextCtx, cardEffectTextCanvas, inputTextList[3], {
+  drawTextCtx(cardEffectTextCtx, cardEffectTextCanvas, inputTextList[4], {
     fontFamily: "serif",
     position: "top-left",
     margin: { top: 0.06, left: 0.03, right: 0.03, bottom: 0.06 },
@@ -157,10 +169,15 @@ document.getElementById("frameSelector").addEventListener("change", (e) => {
     upperLeftTextCanvas.style.left = img.width * 0.03 + "px";
     upperLeftTextCanvas.style.top = img.height * 0.05 + "px";
 
+    upperCenterTextYomiCanvas.width = img.width * 0.4;
+    upperCenterTextYomiCanvas.height = img.height * 0.04;
+    upperCenterTextYomiCanvas.style.left = img.width * 0.31 + "px";
+    upperCenterTextYomiCanvas.style.top = img.height * 0.053 + "px";
+
     upperCenterTextCanvas.width = img.width * 0.4;
-    upperCenterTextCanvas.height = img.height * 0.09;
+    upperCenterTextCanvas.height = img.height * 0.07;
     upperCenterTextCanvas.style.left = img.width * 0.31 + "px";
-    upperCenterTextCanvas.style.top = img.height * 0.05 + "px";
+    upperCenterTextCanvas.style.top = img.height * 0.075 + "px";
 
     upperRightTextCanvas.width = img.width * 0.27;
     upperRightTextCanvas.height = img.height * 0.09;
