@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Fabric.js 吹き出し作成（尻尾改良版）</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <style>
+        #canvas-container {
+            margin-top: 20px;
+        }
+
+        #bubble-text {
+            width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>吹き出し作成ツール</h2>
+    <input type="text" id="bubble-text" placeholder="吹き出しの中身" />
+    <button id="draw-bubble">確定</button>
+    <input type="file" id="image-upload" accept="image/*" style="margin-left:10px;" />
+    <button id="download-canvas">ダウンロード</button>
+
+    <div id="canvas-container">
+        <canvas id="c" width="600" height="400" style="border:1px solid #ccc"></canvas>
+    </div>
+
+    <script>
+        const canvas = new fabric.Canvas('c');
+
+        /** 尻尾を作る補助関数 */
+        function createTail(ellipse, width = 40, height = 40) {
+            // 楕円中心
+            const cx = ellipse.left + ellipse.rx;
+            const cy = ellipse.top + ellipse.ry;
+            // 楕円の下端輪郭上の2点（左右）
+            // θ: 左-10度, 右+10度（ラジアン）
+            const angleLeft = Math.PI / 2 + Math.PI / 18;   // 100度
+            const angleRight = Math.PI / 2 - Math.PI / 18;  // 80度
+            const rx = ellipse.rx;
+            const ry = ellipse.ry;
+            // 楕円のパラメトリック方程式で輪郭上の点を計算
+            const leftBase = {
+                x: cx + rx * Math.cos(angleLeft),
+                y: cy + ry * Math.sin(angleLeft)
+            };
+            const rightBase = {
+                x: cx + rx * Math.cos(angleRight),
+                y: cy + ry * Math.sin(angleRight)
+            };
+            // 尖端は中心真下に
+            const tip = {
+                x: cx,
+                y: cy + ry + height
+            };
+            return new fabric.Polygon([
+                leftBase,
+                rightBase,
+                tip
+            ], {
+                fill: '#fff',
+                stroke: '#333',
+                strokeWidth: 2,
+                selectable: true,
+                objectCaching: false
+            });
+        }
+
+        document.getElementById('draw-bubble').onclick = () => {
+            const textValue = document.getElementById('bubble-text').value || 'テキスト';
+
+            /* ---- 吹き出し本体（楕円） ---- */
+            const ellipse = new fabric.Ellipse({
+                rx: 100, ry: 60,
+                left: 200, top: 100,
+                fill: '#fff',
+                stroke: '#333',
+                strokeWidth: 2,
+                selectable: true
+            });
+
+            /* ---- 吹き出しテキスト ---- */
+            const tempTextbox = new fabric.Textbox(textValue, { width: 180, fontSize: 20, padding: 15 });
+            const textboxHeight = tempTextbox.height;
+
+            const textbox = new fabric.Textbox(textValue, {
+                left: ellipse.left + ellipse.rx - 90,            // 中央揃え (180 / 2)
+                top: ellipse.top + ellipse.ry - textboxHeight / 2,
+                width: 180,
+                fontSize: 20,
+                fill: '#333',
+                textAlign: 'center',
+                editable: false,
+                padding: 15,
+                selectable: true
+            });
+
+            /* ---- 尻尾（三角形） ---- */
+            const tail = createTail(ellipse);
+
+            /* ---- グループ化（楕円・テキスト・尻尾） ---- */
+            const bubbleGroup = new fabric.Group([ellipse, textbox, tail], {
+                left: 0,
+                top: 0,
+                selectable: true
+            });
+
+            canvas.add(bubbleGroup);
+            canvas.setActiveObject(bubbleGroup);
+
+            /* 不要になった一時テキストを破棄 */
+            tempTextbox.dispose();
+        };
+
+        /** 画像アップロード処理 */
+        document.getElementById('image-upload').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (f) {
+                fabric.Image.fromURL(f.target.result, function (img) {
+                    // 画像サイズをキャンバスに収まるよう調整（最大幅400, 高さ300）
+                    const maxW = 400, maxH = 300;
+                    let scale = 1;
+                    if (img.width > maxW || img.height > maxH) {
+                        scale = Math.min(maxW / img.width, maxH / img.height);
+                        img.scale(scale);
+                    }
+                    img.set({
+                        left: (canvas.width - img.getScaledWidth()) / 2,
+                        top: (canvas.height - img.getScaledHeight()) / 2,
+                        selectable: true
+                    });
+                    canvas.add(img);
+                    canvas.setActiveObject(img);
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // ダウンロードボタン処理
+        document.getElementById('download-canvas').onclick = function () {
+            const dataURL = canvas.toDataURL({ format: 'png' });
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = 'canvas.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+    </script>
+</body>
+
+</html>
